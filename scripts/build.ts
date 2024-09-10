@@ -3,6 +3,7 @@ import { RegistryEntry } from "./schema";
 import registryConfig from "../registry.ts";
 import { getGitHubBaseUrl } from "./utils.ts";
 import chalk from "chalk";
+import prettier from "prettier";
 
 console.log("Building registry...");
 
@@ -15,11 +16,17 @@ for (const registryData of registryConfig) {
 
   for (const file of registry.files) {
     if (typeof file === "string") {
+      
+
       const content = await readFile(`./src/components/ui/${file}`, "utf-8");
+      const formattedContent = await prettier.format(content, {
+        parser: "typescript",
+        singleQuote: false,
+      });
       registry.files = registry.files.filter((f) => f !== file);
       registry.files.push({
         path: file,
-        content,
+        content: formattedContent,
         type: "registry:ui",
       });
     }
